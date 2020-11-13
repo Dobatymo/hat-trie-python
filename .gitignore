@@ -1,10 +1,12 @@
 *.bak
 
+# python
 __pycache__/
 *.py[cod]
 *.so
-
-# Distribution / packaging
+*.egg-info
 build/
 dist/
-*.egg-info/
+
+# cython
+cython_debug/

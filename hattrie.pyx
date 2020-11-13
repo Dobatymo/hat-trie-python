@@ -1,15 +1,19 @@
 # distutils: language=c++
 
 from cython.operator cimport dereference as deref, preincrement as inc
+from cpython.ref cimport PyObject
 from libcpp.string cimport string
-from libcpp.utility cimport pair
 from libcpp cimport bool as cbool
 
 from htrie_map cimport htrie_map
+from smartptr cimport PyObjectSmartPtr
 
-cdef class HatTrieMap(object):
+ctypedef PyObject *c_value_t
+ctypedef object p_value_t
 
-	cdef htrie_map[char, string] hattrie
+cdef class HatTrieMap:
+
+	cdef htrie_map[char, PyObjectSmartPtr] hattrie
 
 	def __init__(self):
 		pass
@@ -32,44 +36,69 @@ cdef class HatTrieMap(object):
 	cpdef void clear(self):
 		self.hattrie.clear()
 
-	cpdef insert(self, string key, string value):
-		return self.hattrie.insert(key, value).second
-
-	cpdef size_t erase(self, string key):
-		return self.hattrie.erase(key)
-
-	cpdef size_t erase_prefix(self, string prefix):
-		return self.hattrie.erase_prefix(prefix)
-
-	cpdef string at(self, string key):
-		return self.hattrie.at(key)
-
-	def __getitem__(self, key):
+	def __getitem__(self, string key):
 		try:
-			return self.getitem(key)
+			return <p_value_t>self.hattrie.at(key).get()
 		except IndexError:
-			raise KeyError
+			raise KeyError(key)
 
-	def __setitem__(self, key, value):
-		self.setitem(key, value)
+	def __setitem__(self, string key, object value):
+		self.hattrie.insert(key, PyObjectSmartPtr(<c_value_t>value))
 
-	cdef string getitem(self, string key) nogil except +:
-		return self.hattrie[key]
+	def __delitem__(self, string key):
+		cdef size_t num = self.hattrie.erase(key)
+		if num == 0:
+			raise KeyError(key)
 
-	cdef void setitem(self, string key, string value) nogil:
-		self.hattrie[key] = value
+	def __contains__(self, string key):
+		try:
+			self.hattrie.at(key)
+			return True
+		except IndexError:
+			return False
+
+	def keys(self):
+		cdef htrie_map[char, PyObjectSmartPtr].const_iterator it = self.hattrie.const_begin()
+		while it != self.hattrie.cend():
+			yield it.key()
+			inc(it)
+
+	def values(self):
+		cdef htrie_map[char, PyObjectSmartPtr].const_iterator it = self.hattrie.const_begin()
+		while it != self.hattrie.cend():
+			yield <p_value_t>it.value().get()
+			inc(it)
+
+	def items(self):
+		cdef htrie_map[char, PyObjectSmartPtr].const_iterator it = self.hattrie.const_begin()
+		while it != self.hattrie.cend():
+			yield (it.key(), <p_value_t>it.value().get())
+			inc(it)
+
+	def __iter__(self):
+		return self.keys()
+
+	def pop(self, string key):
+		raise NotImplementedError
+
+	cpdef cbool insert(self, string key, object value):
+		return self.hattrie.insert(key, PyObjectSmartPtr(<c_value_t>value)).second
+
+	def update(self, map):
+		for k, v in map.items():
+			self.hattrie.insert(<string>k, PyObjectSmartPtr(<c_value_t>v))
 
 	cpdef size_t count(self, string key):
 		return self.hattrie.count(key)
 
-	cpdef string find(self, string key):
-		return deref(self.hattrie.find(key))
-
 	def longest_prefix(self, string key):
-		cdef htrie_map[char, string].const_iterator it = self.hattrie.const_longest_prefix(key)
+		cdef htrie_map[char, PyObjectSmartPtr].const_iterator it = self.hattrie.const_longest_prefix(key)
 		while it != self.hattrie.cend():
-			yield deref(it)
+			yield (it.key(), <p_value_t>it.value().get())
 			inc(it)
+
+	cpdef size_t erase_prefix(self, string prefix):
+		return self.hattrie.erase_prefix(prefix)
 
 	@property
 	def max_load_factor(self):

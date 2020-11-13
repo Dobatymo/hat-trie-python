@@ -12,12 +12,18 @@ cdef extern from "htrie_map.h" namespace "tsl" nogil:
 			iterator &operator++()
 			bool operator==(const iterator& lhs, const iterator& rhs)
 			bool operator!=(const iterator& lhs, const iterator& rhs)
+			void key(string& key_buffer_out) const
+			string key() const
+			T value() const
 
 		cppclass const_iterator:
 			const T &operator*()
 			const_iterator &operator++()
 			bool operator==(const const_iterator& lhs, const const_iterator& rhs)
 			bool operator!=(const const_iterator& lhs, const const_iterator& rhs)
+			void key(string& key_buffer_out) const
+			string key() const
+			T value() const
 
 		cppclass prefix_iterator:
 			const T &operator*()
@@ -31,7 +37,7 @@ cdef extern from "htrie_map.h" namespace "tsl" nogil:
 			bool operator==(const const_prefix_iterator& lhs, const const_prefix_iterator& rhs)
 			bool operator!=(const const_prefix_iterator& lhs, const const_prefix_iterator& rhs)
 
-		htrie_map()
+		htrie_map() except +
 
 		iterator begin()
 		const_iterator const_begin "begin" () const
@@ -47,9 +53,9 @@ cdef extern from "htrie_map.h" namespace "tsl" nogil:
 		void shrink_to_fit()
 		void clear()
 
-		pair[iterator, bool] insert_ks(const CharT* key, size_t key_size, const T &value)
-		pair[iterator, bool] insert(const CharT* key, const T &value)
-		pair[iterator, bool] insert(const string& key, const T &value)
+		pair[iterator, bool] insert_ks(const CharT* key, size_t key_size, const T &value) except +
+		pair[iterator, bool] insert(const CharT* key, const T &value) except +
+		pair[iterator, bool] insert(const string& key, const T &value) except +
 
 		iterator erase(const_iterator pos)
 		iterator erase(const_iterator first, const_iterator last)
@@ -62,12 +68,12 @@ cdef extern from "htrie_map.h" namespace "tsl" nogil:
 
 		void swap(htrie_map &other)
 
-		T& at_ks(const CharT* key, size_t key_size)
-		const T& const_at_ks "at_ks" (const CharT* key, size_t key_size) const
-		T& at(const CharT* key)
-		const T& const_at "at" (const CharT* key) const
-		T& at(const string& key)
-		const T& const_at "at" (const string& key) const
+		T& at_ks(const CharT* key, size_t key_size) except +
+		const T& const_at_ks "at_ks" (const CharT* key, size_t key_size) except + # const
+		T& at(const CharT* key) except +
+		const T& const_at "at" (const CharT* key) except + # const
+		T& at(const string& key) except +
+		const T& const_at "at" (const string& key) except + # const
 
 		T &operator[](const CharT* key)
 		T &operator[](const string& key) # string should be basic_string[CharT]
