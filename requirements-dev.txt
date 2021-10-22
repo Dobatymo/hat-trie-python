@@ -1,1 +1,3 @@
-genutility
+genutility==0.0.59; python_version=='2.7'
+genutility==0.0.65; python_version=='3.5'
+genutility; python_version>='3.6'

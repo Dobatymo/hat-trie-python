@@ -1,4 +1,5 @@
 #include <stdexcept>
+#define PY_SSIZE_T_CLEAN
 #include "Python.h"
 
 class PyObjectSmartPtr {
@@ -9,13 +10,11 @@ public:
     PyObjectSmartPtr(): ptr(nullptr) {
     }
 
-    PyObjectSmartPtr(const PyObjectSmartPtr &other) : ptr(other.ptr)
-    {
+    PyObjectSmartPtr(const PyObjectSmartPtr &other) : ptr(other.ptr) {
         Py_XINCREF(ptr);
     }
 
-    PyObjectSmartPtr &operator=(const PyObjectSmartPtr &other)
-    {
+    PyObjectSmartPtr &operator=(const PyObjectSmartPtr &other) {
         if (this != &other)
         {
             Py_XDECREF(ptr);
@@ -52,7 +51,7 @@ public:
         return ptr;
     }
 
-    ssize_t refcount() const {
+    Py_ssize_t refcount() const {
         if (ptr == nullptr) {
             throw std::invalid_argument("nullptr");
         }
