@@ -18,7 +18,7 @@ extensions = [
         "hattrie",
         ["hattrie.pyx"],
         include_dirs=["include", "tessil-hat-trie/include/tsl"],
-        extra_compile_args = cflags, 
+        extra_compile_args=cflags,
         language="c++",
     )
 ]

@@ -2,6 +2,7 @@
 
 from cpython.ref cimport PyObject
 
+
 cdef extern from "smartptr.h":
 	cdef cppclass PyObjectSmartPtr:
 

@@ -1,8 +1,9 @@
 # distutils: language=c++
 
+from libcpp cimport bool
 from libcpp.string cimport string
 from libcpp.utility cimport pair
-from libcpp cimport bool
+
 
 cdef extern from "htrie_map.h" namespace "tsl" nogil:
 	cdef cppclass htrie_map[CharT, T]:

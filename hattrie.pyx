@@ -1,11 +1,11 @@
 # distutils: language=c++
 
-from cython.operator cimport dereference as deref, preincrement as inc
 from cpython.ref cimport PyObject
-from libcpp.string cimport string
-from libcpp cimport bool as cbool
-
+from cython.operator cimport dereference as deref
+from cython.operator cimport preincrement as inc
 from htrie_map cimport htrie_map
+from libcpp cimport bool as cbool
+from libcpp.string cimport string
 from smartptr cimport PyObjectSmartPtr
 
 ctypedef PyObject *c_value_t
