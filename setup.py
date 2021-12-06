@@ -1,5 +1,4 @@
 import sys
-from io import open
 
 from Cython.Build import cythonize
 from setuptools import Extension, setup
@@ -23,7 +22,7 @@ extensions = [
     )
 ]
 
-with open("README.md", "r", encoding="utf-8") as fr:
+with open("README.md", encoding="utf-8") as fr:
     long_description = fr.read()
 
 setup(
@@ -35,7 +34,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     ext_modules=cythonize(extensions),
-    python_requires=">=2.7",
+    python_requires=">=3.6",
     use_2to3=False,
     zip_safe=False,
 )
